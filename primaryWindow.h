@@ -61,6 +61,8 @@ class primaryWindow : public QMainWindow {
         QString settingsFile;
         QString defaultUrl;
         QString dataToSave;
+        //void saveBookmark(QString url);
+        void loadBookmarks();
 
         QWidget *prefWidget;
         QGridLayout *prefGrid;
@@ -99,6 +101,5 @@ class primaryWindow : public QMainWindow {
         QProgressBar *progressBar;
 
         QToolBar *bookmarkToolBar;
-        QStringList allBookmarks;
 };
 #endif

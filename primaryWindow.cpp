@@ -61,10 +61,29 @@ void primaryWindow::contextMenuEvent(QContextMenuEvent *event) {
 
 void primaryWindow::loadConfig() {
     settingsFile = "config.ini";
-    QSettings settings(settingsFile, QSettings::NativeFormat);
+    QSettings settings(settingsFile, QSettings::IniFormat);
     defaultUrl = settings.value("urlDefaultPage", "").toString();
+};
 
-    allBookmarks = settings.value("bookmarks", "").toString().split(",");
+void primaryWindow::loadBookmarks() {
+    QSettings settings(settingsFile, QSettings::IniFormat);
+    settings.beginGroup("bookmarks");
+
+    int size = settings.beginReadArray("bookmark");
+
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        QString url = settings.value("url").toString();
+
+        bookmarkQToolButton *bookmarkButton = new bookmarkQToolButton();
+        bookmarkButton->setUrl(url);
+        QStringList modifiedUrl = url.split(".");
+        bookmarkButton->setText(modifiedUrl.at(1));
+
+        connect(bookmarkButton, SIGNAL(clicked()), bookmarkButton, SLOT(whenClicked()));
+
+        bookmarkToolBar->addWidget(bookmarkButton);
+    }
 };
 
 void primaryWindow::saveSettings() {
@@ -73,6 +92,13 @@ void primaryWindow::saveSettings() {
     settings.setValue("urlDefaultPage", dataToSave);
     loadConfig();
 };
+/*
+void primaryWindow::saveBookmark(QString url) {
+    QSettings settings(settingsFile, QSettings::NativeFormat);
+    QString dataToSave = defaultUrlSetting->text();
+    settings.setValue("urlDefaultPage", dataToSave);
+    loadConfig();
+};*/
 
 /*-----------------------------------------------------------------*/
 
@@ -143,6 +169,8 @@ void primaryWindow::CreateToolBar() {
     addToolBarBreak();
 
     bookmarkToolBar = addToolBar("Bookmark");
+
+    loadBookmarks();
 };
 
 void primaryWindow::CreateStateBar() {
@@ -206,6 +234,7 @@ void primaryWindow::openPrefOnglet() {
 void primaryWindow::bookmark() {
     bookmarkQToolButton *bookmarkButton = new bookmarkQToolButton();
     QString url = urlBar->text();
+    //saveBookmark(QString url);
     bookmarkButton->setUrl(url);
 
     QStringList modifiedUrl = url.split(".");
