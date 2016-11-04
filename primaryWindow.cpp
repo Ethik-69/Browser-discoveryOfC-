@@ -244,6 +244,10 @@ void primaryWindow::bookmark() {
     bookmarkQToolButton *bookmarkButton = new bookmarkQToolButton();
     QString url = urlBar->text();
 
+    if(url.left(8) == "https://") {
+            url.replace("https://", "http://");
+    }
+
     saveBookmark(url);
 
     bookmarkButton->setUrl(url);
