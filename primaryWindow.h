@@ -61,7 +61,7 @@ class primaryWindow : public QMainWindow {
         QString settingsFile;
         QString defaultUrl;
         QString dataToSave;
-        //void saveBookmark(QString url);
+        void saveBookmark(QString url);
         void loadBookmarks();
 
         QWidget *prefWidget;

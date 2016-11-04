@@ -65,6 +65,13 @@ void primaryWindow::loadConfig() {
     defaultUrl = settings.value("urlDefaultPage", "").toString();
 };
 
+void primaryWindow::saveSettings() {
+    QSettings settings(settingsFile, QSettings::IniFormat);
+    QString dataToSave = defaultUrlSetting->text();
+    settings.setValue("urlDefaultPage", dataToSave);
+    loadConfig();
+};
+
 void primaryWindow::loadBookmarks() {
     QSettings settings(settingsFile, QSettings::IniFormat);
     settings.beginGroup("bookmarks");
@@ -86,19 +93,21 @@ void primaryWindow::loadBookmarks() {
     }
 };
 
-void primaryWindow::saveSettings() {
-    QSettings settings(settingsFile, QSettings::NativeFormat);
-    QString dataToSave = defaultUrlSetting->text();
-    settings.setValue("urlDefaultPage", dataToSave);
-    loadConfig();
-};
-/*
 void primaryWindow::saveBookmark(QString url) {
-    QSettings settings(settingsFile, QSettings::NativeFormat);
-    QString dataToSave = defaultUrlSetting->text();
-    settings.setValue("urlDefaultPage", dataToSave);
-    loadConfig();
-};*/
+    QSettings settings(settingsFile, QSettings::IniFormat);
+    settings.beginGroup("bookmarks");
+
+    int size = settings.beginReadArray("bookmark");
+    settings.endArray();
+
+    settings.beginWriteArray("bookmark");
+    settings.setArrayIndex(size);
+
+    settings.setValue("url", url);
+
+    settings.endArray();
+    settings.endGroup();
+};
 
 /*-----------------------------------------------------------------*/
 
@@ -234,7 +243,9 @@ void primaryWindow::openPrefOnglet() {
 void primaryWindow::bookmark() {
     bookmarkQToolButton *bookmarkButton = new bookmarkQToolButton();
     QString url = urlBar->text();
-    //saveBookmark(QString url);
+
+    saveBookmark(url);
+
     bookmarkButton->setUrl(url);
 
     QStringList modifiedUrl = url.split(".");
