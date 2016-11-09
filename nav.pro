@@ -15,5 +15,5 @@ UI_DIR = build/
 QT += widgets core gui webkitwidgets
 
 # Input
-HEADERS += bookmark.h primaryWindow.h bookmark.cpp
-SOURCES += bookmark.cpp main.cpp primaryWindow.cpp
+HEADERS += extendedQToolButton.h primaryWindow.h extendedQToolButton.cpp
+SOURCES += extendedQToolButton.cpp main.cpp primaryWindow.cpp

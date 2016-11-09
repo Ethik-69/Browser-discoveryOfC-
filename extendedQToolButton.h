@@ -3,10 +3,10 @@
 #include <QToolButton>
 #include "primaryWindow.h"
 
-class bookmarkQToolButton : public QToolButton {
+class extendedQToolButton : public QToolButton {
     Q_OBJECT
     public:
-        bookmarkQToolButton();
+        extendedQToolButton();
         void setUrl(QString givenUrl);
         QString getUrl();
 

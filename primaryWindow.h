@@ -8,7 +8,7 @@
 #include <QMainWindow>
 #include <QtWebKit>
 #include <QtGui>
-#include "bookmark.h"
+#include "extendedQToolButton.h"
 
 class QAction;
 class QActionGroup;
@@ -39,6 +39,7 @@ class primaryWindow : public QMainWindow {
         void searchLoad();
 
         void bookmark();
+        void history();
 
         void closeOnglet(int);
         void previous();
@@ -61,8 +62,11 @@ class primaryWindow : public QMainWindow {
         QString settingsFile;
         QString defaultUrl;
         QString dataToSave;
-        void saveBookmark(QString url);
+        void saveInIni(QString section, QString url);
         void loadBookmarks();
+
+        void loadHistory();
+        QStringList historyList;
 
         QWidget *prefWidget;
         QGridLayout *prefGrid;
@@ -95,6 +99,7 @@ class primaryWindow : public QMainWindow {
         QAction *goSearchAction;
         QAction *stopAction;
         QAction *bookmarkAction;
+        QAction *historyAction;
 
         QLineEdit *urlBar;
         QLineEdit *searchBar;

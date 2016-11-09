@@ -45,7 +45,7 @@ primaryWindow::primaryWindow() {
     setCentralWidget(onglets);
 
     setWindowTitle("FNavigateur");
-    resize(1200, 600);
+    resize(1300, 600);
 };
 
 /*-----------------------------------------------------------------*/
@@ -82,7 +82,7 @@ void primaryWindow::loadBookmarks() {
         settings.setArrayIndex(i);
         QString url = settings.value("url").toString();
 
-        bookmarkQToolButton *bookmarkButton = new bookmarkQToolButton();
+        extendedQToolButton *bookmarkButton = new extendedQToolButton();
         bookmarkButton->setUrl(url);
         QStringList modifiedUrl = url.split(".");
         bookmarkButton->setText(modifiedUrl.at(1));
@@ -93,14 +93,18 @@ void primaryWindow::loadBookmarks() {
     }
 };
 
-void primaryWindow::saveBookmark(QString url) {
-    QSettings settings(settingsFile, QSettings::IniFormat);
-    settings.beginGroup("bookmarks");
+void primaryWindow::saveInIni(QString section, QString url) {
+    if(url.left(8) == "https://") {
+            url.replace("https://", "http://");
+    }
 
-    int size = settings.beginReadArray("bookmark");
+    QSettings settings(settingsFile, QSettings::IniFormat);
+    settings.beginGroup(section);
+
+    int size = settings.beginReadArray(section);
     settings.endArray();
 
-    settings.beginWriteArray("bookmark");
+    settings.beginWriteArray(section);
     settings.setArrayIndex(size);
 
     settings.setValue("url", url);
@@ -140,6 +144,9 @@ void primaryWindow::createActions() {
     /*-----------------------------------------------------------------*/
     bookmarkAction = new QAction(QIcon("img/bookm.png"), "Bookmark", this);
     connect(bookmarkAction, SIGNAL(triggered()), this, SLOT(bookmark()));
+    /*-----------------------------------------------------------------*/
+    historyAction = new QAction(QIcon("img/histo.png"), "history", this);
+    connect(historyAction, SIGNAL(triggered()), this, SLOT(history()));
 };
 
 void primaryWindow::createMenus() {
@@ -174,6 +181,7 @@ void primaryWindow::CreateToolBar() {
     navigationToolBar->addWidget(searchBar);
     navigationToolBar->addAction(goSearchAction);
     navigationToolBar->addAction(bookmarkAction);
+    navigationToolBar->addAction(historyAction);
 
     addToolBarBreak();
 
@@ -241,14 +249,14 @@ void primaryWindow::openPrefOnglet() {
 /*-----------------------------------------------------------------*/
 
 void primaryWindow::bookmark() {
-    bookmarkQToolButton *bookmarkButton = new bookmarkQToolButton();
+    extendedQToolButton *bookmarkButton = new extendedQToolButton();
     QString url = urlBar->text();
 
     if(url.left(8) == "https://") {
             url.replace("https://", "http://");
     }
 
-    saveBookmark(url);
+    saveInIni("bookmarks", url);
 
     bookmarkButton->setUrl(url);
 
@@ -314,6 +322,7 @@ void primaryWindow::titleChange(const QString & title) {
 
 void primaryWindow::urlChange(const QUrl & url) {
     urlBar->setText(url.toString());
+    saveInIni("history", url.toString());
 };
 
 void primaryWindow::titleNUrlChange(int index) {
@@ -376,3 +385,42 @@ QWidget *primaryWindow::ongletCreation(QString url) {
 QWebView *primaryWindow::actualPage() {
     return onglets->currentWidget()->findChild<QWebView *>();
 };
+
+/*-----------------------------------------------------------------*/
+
+void primaryWindow::loadHistory() {
+    QSettings settings(settingsFile, QSettings::IniFormat);
+    settings.beginGroup("history");
+
+    int size = settings.beginReadArray("history");
+
+    for (int i = 0; i < size; ++i) {
+        settings.setArrayIndex(i);
+        QString url = settings.value("url").toString();
+        historyList << url;
+    }
+    historyList.removeDuplicates();
+};
+
+void primaryWindow::history() {
+    loadHistory();
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    for(int i=0;i<historyList.size();i++) {
+        extendedQToolButton *historyButton = new extendedQToolButton();
+
+        historyButton->setUrl(historyList.at(i));
+        historyButton->setText(historyList.at(i));
+
+        connect(historyButton, SIGNAL(clicked()), historyButton, SLOT(whenClicked()));
+
+        layout->addWidget(historyButton);
+    }
+
+    QWidget *centralWidget = new QWidget;
+    centralWidget->setLayout(layout);
+
+    QMainWindow *historyWindow = new QMainWindow;
+    historyWindow->setCentralWidget(centralWidget);
+    historyWindow->show();
+}
