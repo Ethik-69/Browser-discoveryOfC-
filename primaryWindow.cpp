@@ -121,7 +121,7 @@ void primaryWindow::createActions() {
     quitAction->setStatusTip(tr("Exit the application"));
     connect(quitAction, &QAction::triggered, this, &QWidget::close);
     /*-----------------------------------------------------------------*/
-    prefAction = new QAction(tr("Préférence"), this);
+    prefAction = new QAction("Préférence", this);
     connect(prefAction, SIGNAL(triggered()), this, SLOT(openPrefOnglet()));
     /*-----------------------------------------------------------------*/
     goSearchAction = new QAction(QIcon("img/go.png"), "go", this);
@@ -326,16 +326,19 @@ void primaryWindow::urlChange(const QUrl & url) {
 };
 
 void primaryWindow::titleNUrlChange(int index) {
-    QString url = onglets->currentWidget()->findChild<QWebView *>()->url().toString();
-    urlBar->setText(url);
+    if(onglets->tabText(index) != "Préférence") {
 
-    QString title = onglets->currentWidget()->findChild<QWebView *>()->title();
+        QString url = onglets->currentWidget()->findChild<QWebView *>()->url().toString();
+        urlBar->setText(url);
 
-    if(title.size() > 20) {
-        title = title.left(20) + "...";
+        QString title = onglets->currentWidget()->findChild<QWebView *>()->title();
+
+        if(title.size() > 20) {
+            title = title.left(20) + "...";
+        }
+
+        setWindowTitle(title);
     }
-
-    setWindowTitle(title);
 };
 
 /*-----------------------------------------------------------------*/
